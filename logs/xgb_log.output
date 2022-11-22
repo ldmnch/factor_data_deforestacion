@@ -1,0 +1,11 @@
+Fitting 5 folds for each of 9 candidates, totalling 45 fits
+              precision    recall  f1-score   support
+
+           0       0.67      0.61      0.64       877
+           1       0.88      0.89      0.88       900
+           2       0.69      0.75      0.72       859
+
+    accuracy                           0.75      2636
+   macro avg       0.75      0.75      0.75      2636
+weighted avg       0.75      0.75      0.75      2636
+
