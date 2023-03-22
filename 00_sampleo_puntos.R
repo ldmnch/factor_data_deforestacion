@@ -3,7 +3,7 @@ library(purrr)
 library(sf)
 library(sp)
 
-data <- st_read('/home/laia/Descargas/training_polygons.geojson')
+data <- st_read('./data/training_polygons.geojson')
 
 lista_puntos <- list()
 
