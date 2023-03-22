@@ -11,13 +11,11 @@ import numpy as np
 import time
 from math import sqrt
 from joblib import dump, load
-<<<<<<< HEAD
+
 def geojson2FeatureCollection(path_file='/content/drive/MyDrive/fundar_deforestacion/ecoregiones/chaco_seco.geojson'):
   with open(path_file) as f:
     json_data = json.load(f)
   return(ee.FeatureCollection(json_data))
-=======
->>>>>>> b335f1de9a942d2d859a60b3b7dd0f7b3328f899
 
 
 def generate_train_test(path = './data/ndvi_points_years/*.geojson'):
@@ -40,8 +38,7 @@ def generate_train_test(path = './data/ndvi_points_years/*.geojson'):
         sets.to_file('/content/drive/MyDrive/deforestation_input/'+split+'_data_final.geojson', 
                      driver='GeoJSON')      
         
-<<<<<<< HEAD
-=======
+
 def geojson2FeatureCollection(path_file='/content/drive/MyDrive/fundar_deforestacion/ecoregiones/chaco_seco.geojson'):
   with open(path_file) as f:
     json_data = json.load(f)
@@ -119,7 +116,6 @@ def years_export(reg_definida):
         exporto_modis(area = reg_definida,
                 rango_anios = range(i, i+3, 1),
                 file_sufix = str(i)+"-"+str(i+2))
->>>>>>> b335f1de9a942d2d859a60b3b7dd0f7b3328f899
 
 def exporto_modis_train_test(area,
                   rango_anios = range(0, 4, 1),
@@ -128,7 +124,6 @@ def exporto_modis_train_test(area,
     modis = ee.ImageCollection("MODIS/MOD09GA_006_NDVI")
 
     lista_modis = []
-<<<<<<< HEAD
     
     for i in rango_anios:
         
@@ -147,7 +142,6 @@ def exporto_modis_train_test(area,
 
     for images in lista_modis[1:]:
         modis_filtrada = modis_filtrada.addBands(images)
-=======
 
     if tipo_ndvi == "anual":
         
@@ -235,7 +229,6 @@ def exporto_modis_train_test(area,
 
         modis_filtrada = modis_filtrada.select(nameOfBands) # Select all bands except the one you wanna remove
 
->>>>>>> b335f1de9a942d2d859a60b3b7dd0f7b3328f899
   
     training = modis_filtrada.sampleRegions(**{
               'collection': train_set,
@@ -269,7 +262,6 @@ def exporto_modis_train_test(area,
 
     print("Exportando train y test de los años "+file_sufix)
     
-<<<<<<< HEAD
 
 def define_final_model(pipeline, model_name):
     
@@ -279,8 +271,6 @@ def define_final_model(pipeline, model_name):
     best_model = pipeline.best_estimator_
 
     dump(pipeline, './models/'+model_name+'.joblib') 
-=======
->>>>>>> b335f1de9a942d2d859a60b3b7dd0f7b3328f899
     
 def run_predictions(table_ndvi,
                     model = ['RF', 'XGB', 'both']):
@@ -325,11 +315,3 @@ def run_predictions(table_ndvi,
         
         
     return(data)
-
-    
-<<<<<<< HEAD
-=======
-    
-    
->>>>>>> b335f1de9a942d2d859a60b3b7dd0f7b3328f899
-    
