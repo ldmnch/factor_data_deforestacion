@@ -18,27 +18,6 @@ def geojson2FeatureCollection(path_file='/content/drive/MyDrive/fundar_deforesta
   return(ee.FeatureCollection(json_data))
 
 
-def generate_train_test(path = './data/ndvi_points_years/*.geojson'):
-    
-    paths = glob.glob(path)
-    
-    print(paths)
-    
-    for split in ['train', 'test']:
-        
-        print(split)
-        
-        paths_split = [x for x in paths if split in x]
-               
-        sets = [gpd.read_file(x) for x in paths_split]
-        sets = gpd.GeoDataFrame(reduce(lambda df1, df2: df1.merge(df2, "inner"), sets))
-        
-        sets = sets.reindex(sorted(sets.columns), axis=1)
-                
-        sets.to_file('/content/drive/MyDrive/deforestation_input/'+split+'_data_final.geojson', 
-                     driver='GeoJSON')      
-        
-
 def exporto_modis_train_test(area,
                   rango_anios = range(0, 4, 1),
                   file_sufix = "00-03"):
@@ -184,6 +163,27 @@ def exporto_modis_train_test(area,
 
     print("Exportando train y test de los años "+file_sufix)
     
+
+def generate_train_test(path = './data/ndvi_points_years/*.geojson'):
+    
+    paths = glob.glob(path)
+    
+    print(paths)
+    
+    for split in ['train', 'test']:
+        
+        print(split)
+        
+        paths_split = [x for x in paths if split in x]
+               
+        sets = [gpd.read_file(x) for x in paths_split]
+        sets = gpd.GeoDataFrame(reduce(lambda df1, df2: df1.merge(df2, "inner"), sets))
+        
+        sets = sets.reindex(sorted(sets.columns), axis=1)
+                
+        sets.to_file('/content/drive/MyDrive/deforestation_input/'+split+'_data_final.geojson', 
+                     driver='GeoJSON')      
+        
 
 def define_final_model(pipeline, model_name):
     
