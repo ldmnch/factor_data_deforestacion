@@ -112,7 +112,7 @@ def run_predictions(table_ndvi,
     
     data =  gpd.read_file(table_ndvi)
     
-    NDVI = data.loc[:,'NDVI_2000':'NDVI_2019']
+    NDVI = data.loc[:,'year_0':'year_19']
     
     if model == "RF":
         
