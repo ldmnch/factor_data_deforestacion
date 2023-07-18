@@ -4,13 +4,14 @@ import glob
 import pandas as pd
 from functools import reduce
 import ee
-import geemap.foliumap as geemap
 import json
 import os
 import numpy as np
 import time
 from math import sqrt
 from joblib import dump, load
+from sklearn.ensemble import RandomForestClassifier
+
 
 def geojson2FeatureCollection(path_file='/content/drive/MyDrive/fundar_deforestacion/ecoregiones/chaco_seco.geojson'):
   with open(path_file) as f:
@@ -107,9 +108,10 @@ def define_final_model(pipeline, model_name):
 
     dumpsets = sets.sort_index(axis=1)
 
-new_column_names = ["year_" + str(i) for i in range(0, 20)]
-sets = sets.rename(columns=dict(zip(sets.columns[:20], new_column_names)))
-(pipeline, '../models/'+model_name+'.joblib') 
+    new_column_names = ["year_" + str(i) for i in range(0, 20)]
+    sets = sets.rename(columns=dict(zip(sets.columns[:20], new_column_names)))
+
+    (pipeline, '../models/'+model_name+'.joblib') 
     
 def run_predictions(table_ndvi,
                     model = ['RF', 'XGB', 'both']):
@@ -155,6 +157,34 @@ def run_predictions(table_ndvi,
         
     return(data)
 
+def join_reducer(left, right):
+    """
+    Take two geodataframes, do a spatial join, and return without the
+    index_left and index_right columns.
+    """
+    sjoin = gpd.sjoin(left, right, how='inner')
+    
+    sjoin_columns = list(sjoin.columns) 
+    
+    if all(value in sjoin_columns for value in ["index_left", "index_right"]):
+        
+        for column in ["index_left", "index_right"]:
+            sjoin.drop(column, axis=1, inplace=True)
+        
+    elif "index_left" in sjoin_columns:
+        
+        sjoin.drop(["index_left"], axis=1, inplace=True)
+        
+    
+    elif "index_right" in sjoin_columns:
+        
+        sjoin.drop(["index_right"], axis=1, inplace=True)
+        
+    else:
+        pass
+
+    return sjoin
+
 def proc_data(path = './data/test_region/*.geojson',
               path_output = './data/test_region/data_final.geojson'):
 
@@ -165,15 +195,22 @@ def proc_data(path = './data/test_region/*.geojson',
     paths_split = [x for x in paths]
 
     sets = [gpd.read_file(x) for x in paths_split]
-    sets = gpd.GeoDataFrame(reduce(lambda df1, df2: df1.merge(df2, "inner"), sets))
-
-    sets = sets.reindex(sorted(sets.columns), axis=1)
+    
+    #Joineo
+    sjoin = reduce(join_reducer, sets)
+    sjoin = sjoin.loc[:,~sjoin.columns.duplicated()]
+    
+    sjoin = sjoin.reindex(sorted(sjoin.columns), axis=1)
+    
+    sjoin = sjoin.loc[:,~sjoin.columns.str.contains('_left', case=False)] 
+    
+    sjoin.columns = sjoin.columns.str.replace('_right','')
 
     new_column_names = ["year_" + str(i) for i in range(0, 20)]
-    sets = sets.rename(columns=dict(zip(sets.columns[:20], new_column_names)))
+    sjoin = sjoin.rename(columns=dict(zip(sjoin.columns[:20], new_column_names)))
 
 
-    sets.to_file(path_output, 
+    sjoin.to_file(path_output, 
                      driver='GeoJSON')      
     
 def exporto_modis(area,
