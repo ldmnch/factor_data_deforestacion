@@ -10,8 +10,6 @@ import numpy as np
 import time
 from math import sqrt
 from joblib import dump, load
-from sklearn.ensemble import RandomForestClassifier
-
 
 def geojson2FeatureCollection(path_file='/content/drive/MyDrive/fundar_deforestacion/ecoregiones/chaco_seco.geojson'):
   with open(path_file) as f:
@@ -162,7 +160,12 @@ def join_reducer(left, right):
     Take two geodataframes, do a spatial join, and return without the
     index_left and index_right columns.
     """
-    sjoin = gpd.sjoin(left, right, how='inner')
+    
+    cols_to_use = left.columns.difference(right.columns)
+    
+    cols_to_use = cols_to_use.union(['geometry'])
+    
+    sjoin = gpd.sjoin(left[cols_to_use], right, how='inner')
     
     sjoin_columns = list(sjoin.columns) 
     
